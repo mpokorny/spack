@@ -265,6 +265,7 @@ class Gasnetex(AutotoolsPackage):
             # default is disabled. 
             args.append('--enable-conservative-local-copy')
 
+<<<<<<< HEAD
         if 'conduit=auto' in self.spec:
             # this is the default -- we let 'auto' override 
             # all other conduit options. 
@@ -311,4 +312,33 @@ class Gasnetex(AutotoolsPackage):
                             '--disable-ibv-rcv-thread'])
             # TODO: need to sort out cray-centric behaviors here...
 
+=======
+        if '+conduit' in self.spec:
+
+            if 'auto' in self.spec.variants['conduit'].values:
+                # this is the default -- we let 'auto' override 
+                # all other conduit options. 
+                args.extend('--enable-auto-conduit-detect')
+            else:
+                # we have one or more conduit options to 
+                # consider.  With any specific conduits 
+                # listed we disable 'auto'...
+                args.extend('--disable-auto-conduit-detect')
+
+                for c in self.spec.variants['conduit'].values:
+                    print(c)
+                    args.extend('--enable-%s') % (c)
+
+                    if (c == 'ibv'):
+                        if '+enable-ibv-multirail' in self.spec:
+                            args.append('--enable-ibv-multirail')
+                        if '+with-ibv-max-hcas' in self.spec:
+                            args.append('--with-ibv-max_hcas=%d' % 
+                                (self.spec['with-ibv-max-hcas'].value))
+
+                    if (c == 'aries'):
+                        if '+aries-max-medium' in self.spec:
+                            args.append('--with-aries-max-medium=%d' % 
+                                (self.spec['aries-max-medium'].value))
+>>>>>>> dd13b6f3a... First cut at a new gasnet(ex) package.
         return args
