@@ -265,10 +265,6 @@ class Gasnetex(AutotoolsPackage):
             # default is disabled. 
             args.append('--enable-conservative-local-copy')
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 89d3f9d0b... fix multiple options code.
         if 'conduit=auto' in self.spec:
             # this is the default -- we let 'auto' override 
             # all other conduit options. 
@@ -294,7 +290,6 @@ class Gasnetex(AutotoolsPackage):
                     if '+aries-max-medium' in self.spec:
                         args.append('--with-aries-max-medium=%d' % 
                             (self.spec['aries-max-medium'].value))
-<<<<<<< HEAD
 
 
         if '+legion' in self.spec:
@@ -316,7 +311,6 @@ class Gasnetex(AutotoolsPackage):
                             '--disable-ibv-rcv-thread'])
             # TODO: need to sort out cray-centric behaviors here...
 
-=======
         if '+conduit' in self.spec:
 
             if 'auto' in self.spec.variants['conduit'].values:
@@ -344,8 +338,4 @@ class Gasnetex(AutotoolsPackage):
                         if '+aries-max-medium' in self.spec:
                             args.append('--with-aries-max-medium=%d' % 
                                 (self.spec['aries-max-medium'].value))
->>>>>>> dd13b6f3a... First cut at a new gasnet(ex) package.
         return args
-=======
-        return args
->>>>>>> 89d3f9d0b... fix multiple options code.
