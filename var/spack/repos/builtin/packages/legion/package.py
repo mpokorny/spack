@@ -22,55 +22,220 @@ class Legion(CMakePackage):
        tuning of Legion applications to new architectures.
     """
     homepage = "http://legion.stanford.edu/"
-    url      = "https://github.com/StanfordLegion/legion/tarball/legion-17.02.0"
+    url      = "https://github.com/StanfordLegion/legion/tarball/legion-20.06.0"
     git      = "https://github.com/StanfordLegion/legion.git"
 
     version('master', branch='master')
+    version('stable',  branch='stable')
+    version('20.06.0', tag='legion-20.06.0')
+    version('20.03.0', tag='legion-20.03.0')
+    version('19.12.0', tag='legion-19.12.0')
+    version('19.09.1', tag='legion-19.09.1')
+    version('19.09.0', tag='legion-19.09.0')
+    version('19.06.0', tag='legion-19.06.0')
+    version('19.04.0', tag='legion-19.04.0')
+    version('18.12.0', tag='legion-18.12.0')
+    version('18.09.0', tag='legion-18.09.0')
+    version('18.02.0', tag='legion-18.02.0')
     version('ctrl-rep', branch='control_replication')
-    version('20.03.0', sha256='ae5feedb5ed9f357b56424b9d73cea4f224a61e291e022556f796d1ff24d1244')
-    version('19.12.0', sha256='ea517638de7256723bb9c119796d4d9d4ef662c52d0151ad24af5288e5a72e7d')
-    version('19.09.1', sha256='c507133fb9dce16b7fcccd7eb2933d13cce96ecf835da60a27c0f66840cabf51')
-    version('19.09.0', sha256='a01c3e3c6698cafb64b77a66341cc06d039faed4fa31b764159f021b94ce13e8')
-    version('19.06.0', sha256='31cd97e9264c510ab83b1f9e8e1e6bf72021a0c6ee4a028966fce08736e39fbf')
-    version('19.04.0', sha256='279bbc8dcdab4c75be570318989a9fc9821178143e9db9c3f62e58bf9070b5ac')
-    version('18.12.0', sha256='71f2c409722975c0ad92f2caffcc9eaa9260f7035e2b55b731d819eb6a94016c')
-    version('18.09.0', sha256='58c5a3072d2b5086225982563c23524692ca5758cbfda8d0f0a4f00ef17b3b8d')
-    version('18.05.0', sha256='4c3cef548b3a459827e4c36b5963c06b6fcf0a4ca1800fbb0f73e6ba3b1cced4')
-    version('18.02.0', sha256='e08aeef98003593391a56f11a99d9d65af49647fe87a2a5e8837c8682a337a60')
-    version('17.10.0', sha256='af4f1e9215e57c4aac4805ae2bf53defe13eeaf192576bf5a702978f43171b1e')
-    version('17.08.0', sha256='20aabdb0fabb1e32aa713cd5fa406525093f8dad33fca5d23046408d42d3c7b3')
-    version('17.02.0', sha256='423d8699729b0e7fef663740e239aa722cca544f6bda8c9f782eaba4274bf60a')
 
-    variant('mpi', default=True,
-            description='Build on top of mpi conduit for mpi inoperability')
-    variant('ibv', default=False,
-            description='Build on top of ibv conduit for InfiniBand support')
-    variant('shared', default=True, description='Build shared libraries')
-    variant('hdf5', default=True, description='Enable HDF5 support')
-    variant('spy', default=False,
-            description='Enable detailed logging for Legion Spy')
-    variant('build_type', default='Release',
-            values=('Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel'),
-            description='The build type to build', multi=False)
+    variant('shared-libs', default=False,
+            description="Build shared libraries.")
+
+    variant('network', default='none', 
+            values=("gasnetex", "mpi", "none"), 
+            description="The network communications layer to use.", 
+            multi=False)
+
+    variant('bounds-checks', default=False,
+            description="Enable bounds checking in Legion accessors.")
+    variant('privilege-checks', default=False, 
+            description="Enable runtime privildge checks in Legion accessors.")
+    variant('enable-tls', default=False, 
+            description="Enable thread-local-storage of the Legion context.")
+    variant('output-level', default='warning',
+            # Note: values are dependent upon Legion's cmake parameters...
+            values=("spew", "debug", "info", "print", "warning", "error", "fatal", "none"),
+            description="Set the compile-time logging level.", 
+            multi=False)
+    variant('spy', default=False, 
+            description="Enable detailed logging for Legion Spy debugging.")
+
+    variant('cuda', default=False, 
+            description="Enable CUDA support.")
+    variant('cuda-hijack', default=False,
+            description="Hijack application calls into the CUDA runtime (implies +cuda).")
+    # note on arch values: 60=pascal, 70=volta, 75=turing 
+    variant('cuda-arch', default='70', # default to supporting volta
+            values=("60", "70", "75"), 
+            description="GPU/CUDA architecture to build for.", 
+            multi=True)
+    variant('fortran', default=False, 
+            description="Enable Fortran bindings.")
+    variant('hdf5', default=False,
+            description="Enable support for HDF5.")
+    variant('hwloc', default=False,
+            description="Use hwloc for topology awareness.")
+    variant('kokkos', default=False,
+            description="Enable support for interoperability with Kokkos.")
+    variant('libdl', default=True, 
+            description="Enable support for dynamic loading (via libdl).")
+    variant('llvm', default=False,
+            description="Enable support for LLVM IR JIT  within the Realm runtime.")
+    variant('link-llvm-libs', default=False,
+            description="Link LLVM libraries into the Realm runtime library.")
+    variant('openmp', default=False,
+            description="Enable support for OpenMP within Legion tasks.")
+    variant('papi', default=False, 
+            description="Enable PAPI performance measurements.")
+    variant('python', default=False, 
+            description="Enable Python support.")
+    variant('zlib', default=True, 
+            description="Enable zlib support.")
+    
+    variant('redop-complex', default=False,
+            description="Use reduction operators for complex types.")
+    
+    variant('build-all', default=False, 
+            description="Build everything: all bindings, examples, tutorials, tests, apps, etc.")
+    variant('build-apps', default=False, 
+            description="Build the sample applicaitons.")
+    variant('build-bindings', default=False, 
+            description="Build all the language bindings (C, Fortran, Python, etc.).")
+    variant('build-examples', default=False, 
+            description="Build the (small'ish) examples.")
+    variant('build-tests', default=False, 
+            description="Build the test suite.")
+    variant('build-tutorial', default=False, 
+            description="Build the Legion tutorial examples.")
+    
+
+    variant('max-dims', values=int, default=3, 
+            description="Set the maximum number of dimensions available in a logical region.")
+    variant('max-fields', values=int, default=512,
+            description="Maximum number of fields allowed in a logical region.")
+
+    conflicts('+cuda-hijack', when='-cuda')
 
     depends_on("cmake@3.1:", type='build')
-    depends_on("gasnet~aligned-segments~pshm segment-mmap-max='16GB'", when='~mpi')
-    depends_on("gasnet~aligned-segments~pshm segment-mmap-max='16GB' +mpi", when='+mpi')
-    depends_on("gasnet~aligned-segments~pshm segment-mmap-max='16GB' +ibv", when='+ibv')
+    depends_on('mpi', when='network=mpi')
+    depends_on('gasnetex', when='network=gasnetex')
+    depends_on('hdf5', when='+hdf5')
+    depends_on('llvm@7.1.0', when='+llvm')
+    depends_on('llvm@7.1.0', when='+link-llvm-libs')
+    depends_on("cuda@10:", when='+cuda')
     depends_on("hdf5", when='+hdf5')
 
     def cmake_args(self):
-        cmake_cxx_flags = [
-            '-DPRIVILEGE_CHECKS',
-            '-DBOUNDS_CHECKS',
-            '-DENABLE_LEGION_TLS']
+        cmake_cxx_flags = [ ]
+        options = [ ]
+        if '+shared_libs' in self.spec:
+            options.append('-DBUILD_SHARED_LIBS=ON')
+        else:
+            options.append('-DBUILD_SHARED_LIBS=OFF')
 
-        options = [
-            '-DLegion_USE_GASNet=ON',
-            '-DLEGION_USE_CUDA=OFF',
-            '-DLEGION_USE_OPENMP=OFF',
-            '-DLegion_BUILD_EXAMPLES=ON',
-            '-DBUILD_SHARED_LIBS=%s' % ('+shared' in self.spec)]
+        if '+bounds_checks' in self.spec:
+            # default is off. 
+            options.append('-DLegion_BOUNDS_CHECKS=ON')
+        if '+privilege_checks' in self.spec:
+            # default is off. 
+            options.append('-DLegion_PRIVILEGE_CHECKS=ON')
+        if '+enable-tls' in self.spec:
+            # default is off. 
+            options.append('-DLegion_ENABLE_TLS=ON')
+        if 'output-level' in self.spec:
+            level = str.upper(self.spec.variants['output-level'].value)
+            options.append('-DLegion_OUTPUT_LEVEL=%s' % level)
+        if '+spy' in self.spec:
+            # default is off. 
+            options.append('-DLegion_SPY=ON')
+  
+        if 'network=gasnet' in self.spec:
+            options.append('-DLegion_NETWORKS=gasnet1')
+        elif 'network=mpi' in self.spec: 
+            options.append('-DLegion_NETWORKS=mpi')
+        # else is no-op... 
+        
+        if '+cuda' in self.spec:
+            cuda_arch = list(self.spec.variants['cuda-arch'].value)
+            arch_str = ','.join(cuda_arch)
+            options.append('-DLegion_USE_CUDA=ON')
+            options.append('-DLegion_GPU_REDUCTIONS=ON')
+            options.append('-DLegion_CUDA_ARCH=%s' % arch_str)
+            if '+cuda-hijack' in self.spec:
+                options.append('-DLegion_HIJACK_CUDART=ON')
+            else:
+                options.append('-DLegion_HIJACK_CUDART=OFF')
+        
+        if '+fortran' in self.spec:
+            # default is off. 
+            options.append('-DLegion_USE_Fortran=ON')
+
+        if '+hdf5' in self.spec:
+            # default is off.
+            options.append('-DLegion_USE_HDF5=ON')
+
+        if '+hwloc' in self.spec:
+            # default is off. 
+            options.append('-DLegion_USE_HWLOC=ON')
+
+        if '+kokkos' in self.spec:
+            # default is off. 
+            options.append('-DLegion_USE_Kokkos=ON')
+
+        if '+libdl' in self.spec:
+            # default is on.
+            options.append('-DLegion_USE_LIBDL=ON')
+        else:
+            options.append('-DLegion_USE_LIBDL=OFF')
+        
+        if '+llvm' in self.spec:
+            # default is off.
+            options.append('-DLegion_USE_LLVM=ON')
+        if '+link-llvm-libs' in self.spec:
+            options.append('-DLegion_LINK_LLVM_LIBS=ON')
+            # TODO: What do we want to do w/ this option?
+            options.append('-DLegion_ALLOW_MISSING_LLVM_LIBS=OFF')
+
+        if '+openmp' in self.spec:
+            # default is off.
+            options.append('-DLegion_USE_OpenMP=ON')
+
+        if '+papi' in self.spec:
+            # default is off. 
+            options.append('-DLegion_USE_PAPI=ON')
+
+        if '+python' in self.spec:
+            # default is off. 
+            options.append('-DLegion_USE_Python=ON')
+
+        if '+zlib' in self.spec:
+            # default is on. 
+            options.append('-DLegion_USE_ZLIB=ON')
+        else:
+            options.append('-DLegion_USE_ZLIB=OFF')
+
+        
+        if '+redop-complex' in self.spec:
+            # default is off. 
+            options.append('-DLegion_REDOP_COMPLEX=ON')
+
+
+        if '+build_all' in self.spec:
+            # default is off. 
+            options.append('-DLegion_BUILD_ALL=ON')
+        if '+build-apps' in self.spec:
+            # default is off. 
+            options.append('-DLegion_BUILD_APPS=ON')
+        if '+build-bindings' in self.spec:
+            # default is off. 
+            options.append('-DLegion_BUILD_BINDINGS=ON')
+        if '+build-examples' in self.spec:
+            options.append('-DLegion_BUILD_EXAMPLES=ON')
+        if '+build-tests' in self.spec:
+            options.append('-DLegion_BUILD_TESTS=ON')
+        if '+build-tutorial' in self.spec:
+            options.append('-DLegion_BUILD_TUTORIAL=ON')
 
         if self.spec.variants['build_type'].value == 'Debug':
             cmake_cxx_flags.extend([
@@ -79,17 +244,14 @@ class Legion(CMakePackage):
                 '-ggdb',
             ])
 
+        if '+max-dims' in self.spec:
+            maxdim = self.spec.variants['max-dims'].value
+            options.append('-DLegion_MAX_DIM=%d' % maxdim)
+        
+        if '+max-fields' in self.spec:
+            maxfields = self.spec.variants['max-fields'].value
+            option.append('-DLegion_MAX_FIELDS=%d' % maxfields)
+
         options.append('-DCMAKE_CXX_FLAGS=%s' % (" ".join(cmake_cxx_flags)))
-
-        if '+mpi' in self.spec:
-            options.append('-DGASNet_CONDUIT=mpi')
-
-        if '+hdf5' in self.spec:
-            options.append('-DLegion_USE_HDF5=ON')
-        else:
-            options.append('-DLegion_USE_HDF5=OFF')
-
-        if '+spy' in self.spec:
-            options.append('-DLegion_SPY=ON')
 
         return options
