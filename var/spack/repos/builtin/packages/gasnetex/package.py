@@ -261,31 +261,29 @@ class Gasnetex(AutotoolsPackage):
             # default is disabled. 
             args.append('--enable-conservative-local-copy')
 
-        if '+conduit' in self.spec:
+        if 'conduit=auto' in self.spec:
+            # this is the default -- we let 'auto' override 
+            # all other conduit options. 
+            args.append('--enable-auto-conduit-detect')
+        else:
+            # we have one or more conduit options to 
+            # consider.  With any specific conduits 
+            # listed we disable 'auto'...
+            args.append('--disable-auto-conduit-detect')
 
-            if 'auto' in self.spec.variants['conduit'].values:
-                # this is the default -- we let 'auto' override 
-                # all other conduit options. 
-                args.extend('--enable-auto-conduit-detect')
-            else:
-                # we have one or more conduit options to 
-                # consider.  With any specific conduits 
-                # listed we disable 'auto'...
-                args.extend('--disable-auto-conduit-detect')
+            conduits = list(self.spec.variants['conduit'].value)
+            for c in conduits:
+                conduit_arg=''.join('--enable-{0}'.format(c))
+                args.append(conduit_arg)
 
-                for c in self.spec.variants['conduit'].values:
-                    print(c)
-                    args.extend('--enable-%s') % (c)
-
-                    if (c == 'ibv'):
-                        if '+enable-ibv-multirail' in self.spec:
-                            args.append('--enable-ibv-multirail')
-                        if '+with-ibv-max-hcas' in self.spec:
-                            args.append('--with-ibv-max_hcas=%d' % 
-                                (self.spec['with-ibv-max-hcas'].value))
-
-                    if (c == 'aries'):
-                        if '+aries-max-medium' in self.spec:
-                            args.append('--with-aries-max-medium=%d' % 
-                                (self.spec['aries-max-medium'].value))
+                if c == 'ibv':
+                    if '+enable-ibv-multirail' in self.spec:
+                        args.append('--enable-ibv-multirail')
+                    if '+with-ibv-max-hcas' in self.spec:
+                        args.append('--with-ibv-max_hcas=%d' % 
+                            (self.spec['with-ibv-max-hcas'].value))
+                elif c == 'aries':
+                    if '+aries-max-medium' in self.spec:
+                        args.append('--with-aries-max-medium=%d' % 
+                            (self.spec['aries-max-medium'].value))
         return args
