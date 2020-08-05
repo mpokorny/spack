@@ -120,6 +120,11 @@ class Gasnetex(AutotoolsPackage):
     variant('ibv-max-hcas', values=int, default=3, 
             description='Number of HCAS for ibv configuration.',)
 
+    # This option is really only helpful if you are building Legion.  Most users
+    # should ignore it... 
+    variant('legion', default=False, 
+            description='Configure GASNetEx with Legion-centric build parameters.')
+
     # Aries conduit specific settings... 
     variant('aries-max-medium', values=int, default=4032, 
             description='specify gasnet_AMMaxMedium() for Aries interconnect.')
@@ -171,7 +176,6 @@ class Gasnetex(AutotoolsPackage):
         args = [
             '--with-max-segsize=%s'   # note: mmap segsize has been deprecated
             % (self.spec.variants['max-seg-size'].value),
-            # '--disable-portals',    # no longer see portals in current config options.
             # for shared libs
             "CC=%s %s" % (spack_cc, self.compiler.cc_pic_flag),
             "CXX=%s %s" % (spack_cxx, self.compiler.cxx_pic_flag),
@@ -286,4 +290,25 @@ class Gasnetex(AutotoolsPackage):
                     if '+aries-max-medium' in self.spec:
                         args.append('--with-aries-max-medium=%d' % 
                             (self.spec['aries-max-medium'].value))
+
+
+        if '+legion' in self.spec:
+            # notes: we leave conduit specification to the normal path here.
+            args.extend(['--disable-portals',
+                         '--disable-mxm',
+                         '--enable-pthreads',
+                         '--enable-segment-fast',
+                         '--enable-par', 
+                         '--disable-seq',
+                         '--disable-parsync',
+                         '--disable-pshm',
+                         '--disable-fca',
+                         '--disable-aligned-segments']
+                        )
+            conduits = list(self.spec.variants['conduit'].value)
+            if 'ibv' in conduits: 
+                args.extend(['--with-ibv-spawner=mpi',
+                            '--disable-ibv-rcv-thread'])
+            # TODO: need to sort out cray-centric behaviors here...
+
         return args
