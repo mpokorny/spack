@@ -123,8 +123,9 @@ class Legion(CMakePackage):
     depends_on('hdf5', when='+hdf5')
     depends_on('llvm@7.1.0', when='+llvm')
     depends_on('llvm@7.1.0', when='+link-llvm-libs')
-    depends_on("cuda@10:", when='+cuda')
-    depends_on("hdf5", when='+hdf5')
+    depends_on('cuda@10:', when='+cuda')
+    depends_on('hdf5', when='+hdf5')
+    depends_on('zlib@1.2.11', when="zlib")
 
     def cmake_args(self):
         cmake_cxx_flags = [ ]
