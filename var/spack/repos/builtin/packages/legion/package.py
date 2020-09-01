@@ -126,6 +126,9 @@ class Legion(CMakePackage):
     depends_on('cuda@10:', when='+cuda')
     depends_on('hdf5', when='+hdf5')
     depends_on('zlib@1.2.11', when="zlib")
+    depends_on('kokkos@3.1', when='+kokkos')
+    depends_on('kokkos@3.1:+cuda', when='+kokkos+cuda')
+
 
     def cmake_args(self):
         cmake_cxx_flags = [ ]
