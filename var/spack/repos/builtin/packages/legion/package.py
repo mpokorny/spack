@@ -65,10 +65,11 @@ class Legion(CMakePackage):
             description="Enable CUDA support.")
     variant('cuda-hijack', default=False,
             description="Hijack application calls into the CUDA runtime (implies +cuda).")
-    # note on arch values: 60=pascal, 70=volta, 75=turing 
+    # note on arch values: 60=pascal, 70=volta, 75=turing
+    cuda_arch_list = ("60", "70", "75")
     variant('cuda-arch', default='70', # default to supporting volta
-            values=("60", "70", "75"), 
-            description="GPU/CUDA architecture to build for.", 
+            values=cuda_arch_list,
+            description="GPU/CUDA architecture to build for.",
             multi=True)
     variant('fortran', default=False, 
             description="Enable Fortran bindings.")
@@ -126,8 +127,11 @@ class Legion(CMakePackage):
     depends_on('cuda@10:', when='+cuda')
     depends_on('hdf5', when='+hdf5')
     depends_on('zlib@1.2.11', when="zlib")
-    depends_on('kokkos@3.1', when='+kokkos')
-    depends_on('kokkos@3.1:+cuda', when='+kokkos+cuda')
+    depends_on('kokkos@3.1:', when='+kokkos')
+    for ca in cuda_arch_list:
+        depends_on(
+            'kokkos+cuda cuda_arch=%s' % ca,
+            when='+kokkos+cuda cuda-arch=%s' % ca)
 
 
     def cmake_args(self):
