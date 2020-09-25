@@ -248,13 +248,11 @@ class Legion(CMakePackage):
                 '-ggdb',
             ])
 
-        if '+max-dims' in self.spec:
-            maxdim = self.spec.variants['max-dims'].value
-            options.append('-DLegion_MAX_DIM=%d' % maxdim)
-        
-        if '+max-fields' in self.spec:
-            maxfields = self.spec.variants['max-fields'].value
-            option.append('-DLegion_MAX_FIELDS=%d' % maxfields)
+        maxdim = self.spec.variants['max-dims'].value
+        options.append('-DLegion_MAX_DIM=%s' % maxdim)
+
+        maxfields = self.spec.variants['max-fields'].value
+        options.append('-DLegion_MAX_FIELDS=%s' % maxfields)
 
         options.append('-DCMAKE_CXX_FLAGS=%s' % (" ".join(cmake_cxx_flags)))
 
