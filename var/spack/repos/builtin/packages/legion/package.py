@@ -256,6 +256,8 @@ class Legion(CMakePackage):
             maxfields = self.spec.variants['max-fields'].value
             option.append('-DLegion_MAX_FIELDS=%d' % maxfields)
 
+        options.append('-DBUILD_MARCH:STRING=%s' % self.spec.architecture.target)
+
         options.append('-DCMAKE_CXX_FLAGS=%s' % (" ".join(cmake_cxx_flags)))
 
         return options
