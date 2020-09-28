@@ -128,6 +128,8 @@ class Legion(CMakePackage):
     depends_on('hdf5', when='+hdf5')
     depends_on('zlib@1.2.11', when="zlib")
     depends_on('kokkos@3.1:', when='+kokkos')
+    depends_on('kokkos-nvcc-wrapper~mpi', when='%gcc+kokkos+cuda')
+    depends_on('kokkos+wrapper', when='%gcc+kokkos+cuda')
     for ca in cuda_arch_list:
         depends_on(
             'kokkos+cuda cuda_arch=%s' % ca,
