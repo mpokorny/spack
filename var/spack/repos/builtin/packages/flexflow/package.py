@@ -15,19 +15,19 @@ class Flexflow(CMakePackage):
     git      = "https://github.com/flexflow/FlexFlow.git"
 
 
-    variant('build-alexnet', Default=False,
+    variant('build-alexnet', default=False,
             description="Build the Alexnet example.")
-    variant('build-alexnet-newapi', Defualt=False,
+    variant('build-alexnet-newapi', default=False,
             description="Build the Alexnet example using the new API.")
-    variant('build-all-examples', Default=False,
+    variant('build-all-examples', default=False,
             description="Build all of the example networks.")
-    variant('build-candle-uno', Default=False,
+    variant('build-candle-uno', default=False,
             description="Build the CANDLE UNO example network.")
-    variant('build-dlrm', Default=False,
+    variant('build-dlrm', default=False,
             description="Build the DLRM example network.")
-    variant('build-inception', Default=False, 
+    variant('build-inception', default=False,
             description="Build the Inception example network.")
-    variant('build-poca')
+    #variant('build-poca')
 
     depends_on('legion@stable+cuda+cuda-hijack')
     depends_on('protobuf@3.12:')
