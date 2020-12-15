@@ -5,7 +5,7 @@
 
 
 from spack import *
-
+import os
 
 class Legion(CMakePackage):
     """Legion is a data-centric parallel programming system for writing
@@ -186,6 +186,7 @@ class Legion(CMakePackage):
         if '+kokkos' in self.spec:
             # default is off. 
             options.append('-DLegion_USE_Kokkos=ON')
+            os.environ['KOKKOS_CXX_COMPILER'] = self.spec['kokkos'].kokkos_cxx
 
         if '+libdl' in self.spec:
             # default is on.
