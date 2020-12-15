@@ -251,13 +251,12 @@ class Legion(CMakePackage):
                 '-ggdb',
             ])
 
-        if '+max_dims' in self.spec:
-            maxdim = self.spec.variants['max_dims'].value
-            options.append('-DLegion_MAX_DIM=%d' % maxdim)
 
-        if '+max_fields' in self.spec:
-            maxfields = self.spec.variants['max_fields'].value
-            option.append('-DLegion_MAX_FIELDS=%d' % maxfields)
+        maxdim = self.spec.variants['max_dims'].value
+        options.append('-DLegion_MAX_DIM=%s' % maxdim)
+
+        maxfields = self.spec.variants['max_fields'].value
+        options.append('-DLegion_MAX_FIELDS=%s' % maxfields)
 
         options.append('-DBUILD_MARCH:STRING=%s' % self.spec.architecture.target)
 
