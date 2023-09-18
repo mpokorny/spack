@@ -11,4 +11,5 @@
 #   ~/.spack/repos.yaml
 # -------------------------------------------------------------------------
 repos:
+  - $spack/var/spack/repos/dsa-2000
   - $spack/var/spack/repos/builtin
